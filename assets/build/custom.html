@@ -69,6 +69,9 @@
 
 		<script type='text/javascript' src='index.js'></script>
 		<script type='text/javascript'>
+			const EXECUTABLE_NAME = 'index';
+			const MAIN_PACK = 'index.pck';
+
 			var engine = new Engine;
 
 			function displayFailureNotice(err) {
@@ -80,7 +83,7 @@
 				displayFailureNotice('WebGL not available');
 			} else {
 				engine
-					.startGame()
+					.startGame(EXECUTABLE_NAME, MAIN_PACK)
 					.then(
 						() => { document.getElementById('status').style.display = 'none'; },
 						displayFailureNotice,
