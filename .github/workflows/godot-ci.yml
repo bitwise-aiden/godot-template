@@ -9,14 +9,14 @@ on:
 
 env:
   EXPORT_NAME: godot-template
-  GODOT_VERSION: 3.3.4
+  GODOT_VERSION: 3.4
 
 jobs:
   export-windows:
     name: Windows Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:3.3.4
+      image: barichello/godot-ci:3.4
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -53,7 +53,7 @@ jobs:
     name: Linux Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:3.3.4
+      image: barichello/godot-ci:3.4
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -89,7 +89,7 @@ jobs:
     name: Web Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:3.3.4
+      image: barichello/godot-ci:3.4
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -125,7 +125,7 @@ jobs:
     name: Mac Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:3.3.4
+      image: barichello/godot-ci:3.4
     steps:
       - name: Checkout
         uses: actions/checkout@v1
