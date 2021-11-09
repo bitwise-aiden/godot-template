@@ -82,7 +82,7 @@ func _init():
 
 func connect_to_twitch() -> void:
 	if(websocket.connect_to_url("wss://irc-ws.chat.twitch.tv:443") != OK):
-		print_debug("Could not connect to Twitch.")
+#		print_debug("Could not connect to Twitch.")
 		emit_signal("twitch_unavailable")
 
 func process(delta : float) -> void:
@@ -110,11 +110,11 @@ func request_caps(caps : String = "twitch.tv/commands twitch.tv/tags twitch.tv/m
 # Sends a String to Twitch.
 func send(text : String, token : bool = false) -> void:
 	websocket.get_peer(1).put_packet(text.to_utf8())
-	if(OS.is_debug_build()):
-		if(!token):
-			print("< " + text.strip_edges(false))
-		else:
-			print("< PASS oauth:******************************")
+#	if(OS.is_debug_build()):
+#		if(!token):
+#			print_debug("< " + text.strip_edges(false))
+#		else:
+#			print_debug("< PASS oauth:******************************")
 
 # Sends a chat message to a channel. Defaults to the only connected channel.
 func chat(message : String, channel : String = ""):
@@ -123,8 +123,8 @@ func chat(message : String, channel : String = ""):
 		chat_queue.append("PRIVMSG " + ("" if channel.begins_with("#") else "#") + channel + " :" + message + "\r\n")
 	elif(keys.size() == 1):
 		chat_queue.append("PRIVMSG #" + channels.keys()[0] + " :" + message + "\r\n")
-	else:
-		print_debug("No channel specified.")
+#	else:
+#		print_debug("No channel specified.")
 
 func whisper(message : String, target : String):
 	chat("/w " + target + " " + message)
@@ -139,8 +139,8 @@ func data_received() -> void:
 			for tag in msg[0].split(";"):
 				var pair = tag.split("=")
 				tags[pair[0]] = pair[1]
-		if(OS.is_debug_build()):
-			print("> " + message)
+#		if(OS.is_debug_build()):
+#			print("> " + message)
 		handle_message(message, tags)
 
 # Registers a command on an object with a func to call, similar to connect(signal, instance, func).
@@ -175,7 +175,7 @@ func add_aliases(cmd_name : String, aliases : PoolStringArray) -> void:
 
 func handle_message(message : String, tags : Dictionary) -> void:
 	if(message == ":tmi.twitch.tv NOTICE * :Login authentication failed"):
-		print_debug("Authentication failed.")
+#		print_debug("Authentication failed.")
 		emit_signal("login_attempt", false)
 		return
 	if(message == "PING :tmi.twitch.tv"):
@@ -185,7 +185,7 @@ func handle_message(message : String, tags : Dictionary) -> void:
 	var msg : PoolStringArray = message.split(" ", true, 4)
 	match msg[1]:
 		"001":
-			print_debug("Authentication successful.")
+#			print_debug("Authentication successful.")
 			emit_signal("login_attempt", true)
 		"PRIVMSG":
 			var sender_data : SenderData = SenderData.new(user_regex.search(msg[0]).get_string(), msg[2], tags)
@@ -224,13 +224,13 @@ func handle_command(sender_data : SenderData, msg : PoolStringArray, whisper : b
 			var arg_ary : PoolStringArray = PoolStringArray() if args == "" else args.split(" ")
 			if(arg_ary.size() > cmd_data.max_args && cmd_data.max_args != -1 || arg_ary.size() < cmd_data.min_args):
 				emit_signal("cmd_invalid_argcount", command, sender_data, cmd_data, arg_ary)
-				print_debug("Invalid argcount!")
+#				print_debug("Invalid argcount!")
 				return
 			if(cmd_data.permission_level != 0):
 				var user_perm_flags = get_perm_flag_from_tags(sender_data.tags)
 				if(user_perm_flags & cmd_data.permission_level != cmd_data.permission_level):
 					emit_signal("cmd_no_permission", command, sender_data, cmd_data, arg_ary)
-					print_debug("No Permission for command!")
+#					print_debug("No Permission for command!")
 					return
 			if(arg_ary.size() == 0):
 				cmd_data.func_ref.call_func(CommandInfo.new(sender_data, command, whisper))
@@ -267,12 +267,12 @@ func leave_channel(channel : String) -> void:
 	channels.erase(lower_channel)
 
 func connection_established(protocol : String) -> void:
-	print_debug("Connected to Twitch.")
+#	print_debug("Connected to Twitch.")
 	emit_signal("twitch_connected")
 
 func connection_closed(was_clean_close : bool) -> void:
 	if(twitch_restarting):
-		print_debug("Reconnecting to Twitch")
+#		print_debug("Reconnecting to Twitch")
 		emit_signal("twitch_reconnect")
 		connect_to_twitch()
 		yield(self, "twitch_connected")
@@ -280,11 +280,11 @@ func connection_closed(was_clean_close : bool) -> void:
 			join_channel(channel)
 		twitch_restarting = false
 	else:
-		print_debug("Disconnected from Twitch.")
+#		print_debug("Disconnected from Twitch.")
 		emit_signal("twitch_disconnected")
 
 func connection_error() -> void:
-	print_debug("Twitch is unavailable.")
+#	print_debug("Twitch is unavailable.")
 	emit_signal("twitch_unavailable")
 
 func server_close_request(code : int, reason : String) -> void:

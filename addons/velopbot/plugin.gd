@@ -67,6 +67,8 @@ func __chat_message(sender : SenderData, message: String, channel: String) -> vo
 	elif false && sender.user in self.user_responses:
 		self.twitch.chat(self.user_responses[sender.user])
 		self.user_responses.erase(sender.user)
+	
+	print("%s: %s" % [sender.user, message])
 
 
 func __command(sender: SenderData, message: String) -> void:
@@ -123,23 +125,20 @@ func __response_json(data: Dictionary) -> PoolByteArray:
 
 func __start_client() -> void:
 	self.twitch = Gift.new()
-
-	var settings = self.__load_settings()
-	if !settings:
-		print("No settings found")
-		self.set_process(false)
-		return
+	
+	var channel = OS.get_environment("VELOPBOT_CHANNEL")
+	var token = OS.get_environment("VELOPBOT_TOKEN")
 
 	self.twitch.connect("chat_message", self, "__chat_message")
 
 	self.twitch.connect_to_twitch()
 	yield(self.twitch, "twitch_connected")
 
-	self.twitch.authenticate_oauth("TheYagich", settings["oauth_token"])
+	self.twitch.authenticate_oauth("TheYagich", token)
 	if(yield(twitch, "login_attempt") == false):
 		print("Invalid token.")
 		return
-	self.twitch.join_channel(settings["channel_name"])
+	self.twitch.join_channel(channel)
 
 	self.twitch.add_command("buzz", self, "__command_buzz")
 	self.twitch.add_command("so", self, "__command_shoutout", 1, 1)
@@ -151,16 +150,7 @@ var _server: TCP_Server = null
 
 func __start_server():
 	self._server = TCP_Server.new()
-#	# Create and set key and self-signed certificate.
-#	var crypto = Crypto.new()
-#	var key = crypto.generate_rsa(4096)
-#	var cert = crypto.generate_self_signed_certificate(key, "CN=localhost,O=myorganisation,C=IT")
-#	_server.private_key = key
-#	_server.ssl_certificate = cert
-
-	# Start server.
-#	_server.connect("client_connected", self, "_connected")
-	_server.listen(PORT)
+	self._server.listen(PORT)
 
 func _connected(id, protocol):
 	print(id, protocol)
