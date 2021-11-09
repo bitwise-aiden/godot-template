@@ -45,7 +45,7 @@
 				top: 0;
 				right: 0;
 				bottom: 0;
-				display: flex;
+				display: block;
 				justify-content: center;
 				align-items: center;
 				/* don't consume click events - make children visible explicitly */
@@ -70,24 +70,21 @@
 		<script type='text/javascript' src='index.js'></script>
 		<script type='text/javascript'>
 			var engine = new Engine;
-			var status = document.getElementById('status');
 
 			function displayFailureNotice(err) {
 				var msg = err.message || err;
 				console.error(msg);
 			};
-			
-			status.style.display = 'block'
+
 			if (!Engine.isWebGLAvailable()) {
 				displayFailureNotice('WebGL not available');
 			} else {
-				// engine.setCanvas(canvas);
-				// engine.startGame(EXECUTABLE_NAME, MAIN_PACK).then(() => {}, displayFailureNotice);
 				engine
 					.startGame()
-					.then(() => {
-						status.style.display = 'none';
-					});
+					.then(
+						() => { document.getElementById('status').style.display = 'none'; },
+						displayFailureNotice,
+					);
 			}
 		</script>
 	</body>
