@@ -67,7 +67,7 @@ func __chat_message(sender : SenderData, message: String, channel: String) -> vo
 	elif false && sender.user in self.user_responses:
 		self.twitch.chat(self.user_responses[sender.user])
 		self.user_responses.erase(sender.user)
-	
+
 	print("%s: %s" % [sender.user, message])
 
 
@@ -95,19 +95,6 @@ func __command_time(command_info: CommandInfo) -> void:
 	self.twitch.chat("%02d:%02d eastern" % [time.hour, time.minute])
 
 
-func __load_settings() -> Dictionary:
-	var file: File = File.new()
-
-	if file.file_exists("user://plugin.json"):
-		file.open("user://plugin.json", File.READ)
-		var content: String = file.get_as_text()
-		file.close()
-
-		return JSON.parse(content).result
-
-	return {}
-
-
 func __response_json(data: Dictionary) -> PoolByteArray:
 	var data_string = JSON.print(data)
 
@@ -125,7 +112,7 @@ func __response_json(data: Dictionary) -> PoolByteArray:
 
 func __start_client() -> void:
 	self.twitch = Gift.new()
-	
+
 	var channel = OS.get_environment("VELOPBOT_CHANNEL")
 	var token = OS.get_environment("VELOPBOT_TOKEN")
 
