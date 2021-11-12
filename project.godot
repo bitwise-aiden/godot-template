@@ -106,7 +106,7 @@ window/stretch/aspect="keep"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/velopbot/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/ridiculous_coding/plugin.cfg", "res://addons/velopbot/plugin.cfg" )
 
 [rendering]
 
