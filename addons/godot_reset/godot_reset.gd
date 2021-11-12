@@ -1,13 +1,16 @@
 tool
-extends EditorPlugin
+class_name GodotReset extends EditorPlugin
+
+signal enable_ridiculous_coding()
 
 var __regex: Dictionary = {
 	"set_color": "^#?([0-9a-f]{3}|[0-9a-f]{6})$",
 	"black": "^#?(0{3}|0{6})$"
 }
 var __server: UDPServer = null
-var __settings: EditorSettings
-var __timer: Timer = null
+var __settings: EditorSettings = null
+var __timer_poll: Timer = null
+var __timer_coding: Timer = null
 
 
 
@@ -19,12 +22,17 @@ func _enter_tree() -> void:
 	self.__server = UDPServer.new()
 	self.__server.listen(4242)
 
-	self.__timer = Timer.new()
-	self.__timer.autostart = true
-	self.__timer.wait_time = 0.3
-	self.__timer.connect("timeout", self, "__poll")
+	self.__timer_poll = Timer.new()
+	self.__timer_poll.autostart = true
+	self.__timer_poll.wait_time = 0.3
+	self.__timer_poll.connect("timeout", self, "__poll")
+	self.add_child(self.__timer_poll)
 
-	self.add_child(self.__timer)
+	self.__timer_coding = Timer.new()
+	self.__timer_coding.wait_time = 60.0
+	self.__timer_coding.one_shot = true
+	self.__timer_coding.connect("timeout", self, "__disable_coding")
+	self.add_child(self.__timer_coding)
 
 	for key in self.__regex.keys():
 		var ex = RegEx.new()
@@ -36,7 +44,12 @@ func _exit_tree() -> void:
 	print("Godot Reset disabled")
 
 
-func __poll():
+func __disable_coding() -> void:
+	var editor = get_editor_interface()
+	editor.set_plugin_enabled("ridiculous_coding", false)
+
+
+func __poll() -> void:
 	self.__server.poll()
 	if self.__server.is_connection_available():
 		var peer : PacketPeerUDP = self.__server.take_connection()
@@ -66,5 +79,12 @@ func __poll():
 					"interface/theme/base_color",
 					color
 				)
+			{"type": "enable_ridiculous_coding", "username": var username}:
+				print("Time to get ridiculous thanks to %s!" % username)
+
+				var editor = get_editor_interface()
+				editor.set_plugin_enabled("ridiculous_coding", true)
+
+				self.__timer_coding.start()
 			_:
 				print("invalid payload: ", typeof(data), data)
