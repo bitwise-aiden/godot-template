@@ -34,6 +34,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/gift/gift_node.gd"
 }, {
+"base": "EditorPlugin",
+"class": "GodotReset",
+"language": "GDScript",
+"path": "res://addons/godot_reset/godot_reset.gd"
+}, {
 "base": "Node",
 "class": "ImageCache",
 "language": "GDScript",
@@ -65,6 +70,7 @@ _global_script_class_icons={
 "CommandInfo": "",
 "CurrentQueue": "",
 "Gift": "",
+"GodotReset": "",
 "ImageCache": "",
 "PlayerInput": "",
 "SenderData": "",
@@ -80,7 +86,6 @@ config/icon="res://icon.png"
 
 [autoload]
 
-WebBuild="*res://source/autoloads/web_build.gd"
 Globals="*res://source/autoloads/globals.gd"
 Event="*res://source/autoloads/event.gd"
 FileManager="*res://source/autoloads/file_manager.gd"
@@ -106,7 +111,7 @@ window/stretch/aspect="keep"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/ridiculous_coding/plugin.cfg", "res://addons/velopbot/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/velopbot/plugin.cfg" )
 
 [rendering]
 
