@@ -44,6 +44,30 @@ func _exit_tree() -> void:
 	print("Godot Reset disabled")
 
 
+var __focused_text_edit: TextEdit = null
+
+func _process(delta: float) -> void:
+	var editor: EditorInterface  = self.get_editor_interface()
+	var script_editor: ScriptEditor = editor.get_script_editor()
+
+	for text_edit in self.__find_text_edits(script_editor):
+		if text_edit.has_focus():
+			self.__focused_text_edit = text_edit
+			return
+
+func __find_text_edits(parent: Node) -> Array:
+	var text_edits: Array = []
+
+	for child in parent.get_children():
+		if child.get_child_count():
+			text_edits.append_array(self.__find_text_edits(child))
+
+		if child is TextEdit:
+			text_edits.append(child)
+
+	return text_edits
+
+
 func __disable_coding() -> void:
 	var editor = get_editor_interface()
 	editor.set_plugin_enabled("ridiculous_coding", false)
@@ -86,5 +110,31 @@ func __poll() -> void:
 				editor.set_plugin_enabled("ridiculous_coding", true)
 
 				self.__timer_coding.start()
+			{"type": "add_comment", "username": var username, "comment": var comment}:
+				if username == 'Liioni':
+					username = 'Lil\'Oni'
+
+				if !self.__focused_text_edit:
+					print("Sorry %s, it looks like there are no open scripts")
+					return
+
+				print("%s has left a comment in the code" % username)
+			 # this part of the code was sponsored by RAID SHADOW LEGENDS - Lumikkode
+
+				var cursor_line: int = self.__focused_text_edit.cursor_get_line()
+				var cursor_column: int = self.__focused_text_edit.cursor_get_column()
+				var scroll_horizontal: int = self.__focused_text_edit.scroll_horizontal
+				var scroll_vertical: float = self.__focused_text_edit.scroll_vertical
+
+				var line_length = self.__focused_text_edit.get_line(cursor_line).length()
+				self.__focused_text_edit.cursor_set_column(line_length)
+
+				self.__focused_text_edit.insert_text_at_cursor(" # %s - %s" % [comment, username]) # expletive - TheYagich # pee break - totally_not_a_spambot
+
+				self.__focused_text_edit.cursor_set_line(cursor_line)
+				self.__focused_text_edit.cursor_set_column(cursor_column)
+				self.__focused_text_edit.scroll_horizontal = scroll_horizontal
+				self.__focused_text_edit.scroll_vertical = scroll_vertical
+
 			_:
 				print("invalid payload: ", typeof(data), data)
