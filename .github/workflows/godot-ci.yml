@@ -1,0 +1,52 @@
+name: "godot-ci export"
+on: push
+
+env:
+  GODOT_VERSION: 4.4.1
+  PROJECT_PATH: .
+
+jobs:
+  export-web:
+    name: Web Export
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+      - name: Web Build
+        run: |
+          mkdir -v -p build/web
+          EXPORT_DIR="$(readlink -f build)"
+          cd $PROJECT_PATH
+          godot --headless --verbose --export-release "Web" "$EXPORT_DIR/web/index.html"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: build/web
+      - name: Install rsync 📚
+        run: |
+          apt-get update && apt-get install -y rsync
+      - name: Extract ITCH_USER and ITCH_GAME
+        id: extract_repo_info
+        run: |
+          REPO_FULL="${{ github.repository }}"
+          ITCH_USER="${REPO_FULL%%/*}"
+          ITCH_GAME="${REPO_FULL##*/}"
+          echo "ITCH_USER=$ITCH_USER" >> $GITHUB_ENV
+          echo "ITCH_GAME=$ITCH_GAME" >> $GITHUB_ENV
+      - name: Butler Upload
+        uses: yeslayla/butler-publish-itchio-action@master
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
+          CHANNEL: web
+          ITCH_GAME: ${{ env.ITCH_GAME }}
+          ITCH_USER: ${{ env.ITCH_USER }}
+          PACKAGE: build/web
